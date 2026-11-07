@@ -1,0 +1,54 @@
+---
+const { current = "" } = Astro.props;
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/cv", label: "CV" },
+  { href: "/hobbies", label: "After Hours" },
+];
+---
+
+<header class="site-header">
+  <a href="/" class="logo">Hex</a>
+  <nav aria-label="Main">
+    <ul>
+      {links.map((l) => (
+        <li>
+          <a href={l.href} aria-current={current === l.href ? "page" : undefined}>
+            {l.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--page-pad);
+  }
+  .logo {
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-decoration: none;
+  }
+  ul {
+    display: flex;
+    gap: var(--space-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav a {
+    text-decoration: none;
+    color: var(--text-muted);
+  }
+  nav a:hover,
+  nav a[aria-current="page"] {
+    color: var(--text);
+  }
+</style>

@@ -1,0 +1,23 @@
+---
+import Header from "../components/Header.astro";
+import "../styles/global.css";
+
+const { title, description = "Portfolio" } = Astro.props;
+const current = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Header current={current} />
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>
