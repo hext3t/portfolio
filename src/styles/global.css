@@ -13,6 +13,12 @@
   --cat-photo: #0c8599;
   --cat-uiux: #d6336c;
 
+    /* After Hours category colors (placeholders) */
+  --cat-games: #2f9e44;
+  --cat-animation: #1c7ed6;
+  --cat-music: #ae3ec9;
+  --cat-sewing: #f59f00;
+
   /* Type */
   --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
 
@@ -54,6 +60,6 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-  
-body:has(dialog[open]) { overflow: hidden; }
 }
+
+body:has(dialog[open]) { overflow: hidden; }

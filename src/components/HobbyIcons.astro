@@ -1,0 +1,237 @@
+---
+import { desktopItems, projectBySlug, categoryById } from "../data/afterhours";
+
+const folders = desktopItems.flatMap((i) => (i.type === "folder" ? [i] : []));
+---
+
+<section class="shelf">
+  <ul class="folders">
+    {desktopItems.map((item) => {
+      if (item.type === "project") {
+        const p = projectBySlug[item.slug];
+        const c = categoryById[p.category];
+        return (
+          <li>
+            <button class="folder game" type="button" style={`--cat: ${c.color}`} data-open={p.slug} aria-haspopup="dialog">
+              {p.icon ? (
+                <img class="icon" src={p.icon} alt="" width="120" height="100" />
+              ) : (
+                <svg class="icon" viewBox="0 0 96 80" aria-hidden="true">
+                  <rect x="12" y="2" width="72" height="72" rx="18" fill="currentColor" />
+                  <path d="M42 24l22 14-22 14z" fill="#fff" />
+                </svg>
+              )}
+              <span class="label">{p.title}</span>
+            </button>
+          </li>
+        );
+      }
+      const c = categoryById[item.category];
+      return (
+        <li>
+          <button
+            class="folder"
+            type="button"
+            style={`--cat: ${c.color}`}
+            aria-expanded="false"
+            aria-controls={`tray-${item.id}`}
+            data-tray
+          >
+            <svg class="icon icon-closed" viewBox="0 0 96 80" aria-hidden="true">
+              <path d="M6 14a6 6 0 0 1 6-6h22l8 8h42a6 6 0 0 1 6 6v46a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6z" fill="currentColor" opacity=".55" />
+              <rect x="6" y="24" width="84" height="50" rx="6" fill="currentColor" />
+            </svg>
+            <svg class="icon icon-open" viewBox="0 0 96 80" aria-hidden="true">
+              <path d="M6 14a6 6 0 0 1 6-6h22l8 8h42a6 6 0 0 1 6 6v46a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6z" fill="currentColor" opacity=".55" />
+              <path d="M16 30H94L82 74H6Z" fill="currentColor" stroke="currentColor" stroke-width="4" stroke-linejoin="round" />
+            </svg>
+            <span class="label">{item.label}</span>
+          </button>
+        </li>
+      );
+    })}
+  </ul>
+
+  {folders.map((f) => (
+    <div class="tray" id={`tray-${f.id}`} hidden>
+      <ul class="works">
+        {f.projects.map((slug) => {
+          const p = projectBySlug[slug];
+          const c = categoryById[p.category];
+          return (
+            <li>
+              <button type="button" class="work" data-open={p.slug} aria-haspopup="dialog">
+                <span class="thumb" style={`--cat: ${c.color}`}>
+                  {p.icon && <img src={p.icon} alt="" loading="lazy" />}
+                </span>
+                <span class="work-title">{p.title}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  ))}
+</section>
+
+<style>
+  .shelf {
+    position: relative;
+    max-width: 1000px;
+    margin-inline: auto;
+    padding: var(--space-5) var(--page-pad);
+  }
+
+  .folders {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  @media (max-width: 640px) {
+    .folders { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .folder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-3);
+    background: none;
+    border: 0;
+    border-radius: 12px;
+    color: var(--cat, var(--accent));
+    font: inherit;
+    cursor: pointer;
+  }
+  .folder:hover { background: color-mix(in srgb, var(--cat, var(--accent)) 8%, transparent); }
+  .folder:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .icon { width: 120px; max-width: 100%; height: auto; }
+  .icon-open { display: none; }
+  .folder[aria-expanded="true"] .icon-closed { display: none; }
+  .folder[aria-expanded="true"] .icon-open { display: block; }
+
+  .label { color: var(--text); font-size: 0.95rem; }
+
+  .tray {
+    position: relative;
+    margin-top: var(--space-4);
+    padding: var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.12);
+  }
+  .tray[hidden] { display: none; }
+  .tray:not([hidden]) {
+    transform-origin: top;
+    animation: pop 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  }
+  .tray::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: var(--caret-x, 50%);
+    width: 16px;
+    height: 16px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    transform: translateX(-50%) rotate(45deg);
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .works {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .work {
+    display: block;
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 8px;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .work:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .thumb {
+    display: block;
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--cat, var(--accent)) 22%, var(--surface));
+    border-bottom: 3px solid var(--cat, var(--accent));
+    transition: transform 150ms ease;
+  }
+  .work:hover .thumb { transform: translateY(-2px); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .work-title { display: block; margin-top: var(--space-2); font-size: 0.85rem; color: var(--text-muted); }
+</style>
+
+<script>
+  const shelf = document.querySelector<HTMLElement>(".shelf")!;
+  const buttons = shelf.querySelectorAll<HTMLButtonElement>("[data-tray]");
+  const trays = shelf.querySelectorAll<HTMLElement>(".tray");
+
+  function trayFor(btn: HTMLButtonElement) {
+    return document.getElementById(btn.getAttribute("aria-controls")!)!;
+  }
+
+  function placeCaret(btn: HTMLButtonElement, tray: HTMLElement) {
+    const s = shelf.getBoundingClientRect();
+    const b = btn.getBoundingClientRect();
+    tray.style.setProperty("--caret-x", `${b.left - s.left + b.width / 2}px`);
+  }
+
+  function closeAll() {
+    buttons.forEach((b) => b.setAttribute("aria-expanded", "false"));
+    trays.forEach((t) => (t.hidden = true));
+  }
+
+  function open(btn: HTMLButtonElement) {
+    const tray = trayFor(btn);
+    closeAll();
+    btn.setAttribute("aria-expanded", "true");
+    placeCaret(btn, tray);
+    tray.hidden = false;
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      btn.getAttribute("aria-expanded") === "true" ? closeAll() : open(btn);
+    });
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !document.querySelector("dialog[open]")) closeAll();
+  });
+
+  window.addEventListener("resize", () => {
+    const active = shelf.querySelector<HTMLButtonElement>('[data-tray][aria-expanded="true"]');
+    if (active) placeCaret(active, trayFor(active));
+  });
+
+  // When a project opens (click or URL hash), expand the folder that holds it
+  window.addEventListener("hobby:opened", (e) => {
+    const folder = (e as CustomEvent<{ folder: string | null }>).detail.folder;
+    if (!folder) return;
+    const btn = shelf.querySelector<HTMLButtonElement>(`[data-tray][aria-controls="tray-${folder}"]`);
+    if (btn && btn.getAttribute("aria-expanded") !== "true") open(btn);
+  });
+</script>

@@ -1,10 +1,23 @@
 ---
 import Base from "../layouts/Base.astro";
+import HobbyIcons from "../components/HobbyIcons.astro";
+import HobbyWindow from "../components/HobbyWindow.astro";
 ---
 
-<Base title="Hobbies">
-  <div style="padding: var(--space-5) var(--page-pad)">
-    <h1>Hobbies</h1>
-    <p>Content coming soon.</p>
+<Base title="After Hours">
+  <div class="page">
+    <h1>After Hours</h1>
+    <p class="intro">Games, animations and other things I make for fun.</p>
+    <HobbyIcons />
   </div>
+  <HobbyWindow />
 </Base>
+
+<style>
+  .page {
+    max-width: 1100px;
+    margin-inline: auto;
+    padding: var(--space-5) var(--page-pad);
+  }
+  .intro { margin: 0 0 var(--space-4); color: var(--text-muted); }
+</style>

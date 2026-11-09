@@ -1,0 +1,424 @@
+---
+import { desktopItems, hobbyProjects, projectBySlug, categoryById } from "../data/afterhours";
+
+const folders = desktopItems.flatMap((i) => (i.type === "folder" ? [i] : []));
+const folderOf: Record<string, (typeof folders)[number]> = {};
+for (const f of folders) {
+  for (const s of f.projects) folderOf[s] ??= f;
+}
+---
+
+<dialog class="window" id="hobby-window" aria-labelledby="hobby-title">
+  <div class="win">
+    <div class="titlebar" data-drag-handle>
+      <div class="lights">
+        <button type="button" class="light close" aria-label="Close window" data-close></button>
+        <span class="light min" aria-hidden="true"></span>
+        <span class="light max" aria-hidden="true"></span>
+      </div>
+      <h2 id="hobby-title" class="win-title">Project</h2>
+      <button type="button" class="done" data-close>Done</button>
+    </div>
+    <div class="content" id="hobby-content" tabindex="-1" role="region" aria-labelledby="hobby-title"></div>
+  </div>
+</dialog>
+
+{hobbyProjects.map((p) => {
+  const c = categoryById[p.category];
+  const folder = folderOf[p.slug];
+  return (
+<template id={`hobby-${p.slug}`} data-title={p.title} data-folder={folder?.id}>
+      <article class="project" style={`--cat: ${c.color}`}>
+        <div class="meta">
+          <span class="pill"><span class="dot"></span>{c.label}</span>
+          <span class="date">{p.date}</span>
+        </div>
+        <p class="desc">{p.description}</p>
+        {p.tools.length > 0 && (
+          <ul class="tools" aria-label="Tools used">
+            {p.tools.map((t) => <li>{t}</li>)}
+          </ul>
+        )}
+        {p.links && p.links.length > 0 && (
+          <div class="actions">
+            {p.links.map((l) => {
+              const external = l.href.startsWith("http");
+              return (
+                <a
+                  class="btn"
+                  href={l.href}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                  download={l.kind === "download" && !external ? "" : undefined}
+                >
+                  {l.label}
+                  {external && <span class="sr-only"> (opens in a new tab)</span>}
+                </a>
+              );
+            })}
+          </div>
+        )}
+        <div class="media">
+          {p.media.length === 0 && <div class="placeholder">Media coming soon</div>}
+          {p.media.map((m) =>
+            m.type === "image" ? (
+              <img src={m.src} alt={m.alt} loading="lazy" decoding="async" />
+            ) : (
+              <div class="video">
+                <iframe
+                  src={m.type === "youtube"
+                    ? `https://www.youtube-nocookie.com/embed/${m.id}`
+                    : `https://player.vimeo.com/video/${m.id}`}
+                  title={m.title}
+                  loading="lazy"
+                  allow="fullscreen; picture-in-picture"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            )
+          )}
+        </div>
+      </article>
+    </template>
+  );
+})}
+
+<style>
+  .window {
+    width: min(760px, calc(100vw - 2rem));
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+    transform: translate(var(--dx, 0px), var(--dy, 0px));
+  }
+  .window::backdrop { background: rgb(0 0 0 / 0.25); }
+  .window[open] { animation: win-in 200ms cubic-bezier(0.2, 0.9, 0.3, 1.1); }
+  @keyframes win-in {
+    from { opacity: 0; scale: 0.96; }
+    to { opacity: 1; scale: 1; }
+  }
+
+  .win {
+    display: flex;
+    flex-direction: column;
+    max-height: min(80vh, 760px);
+  }
+
+  .titlebar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0.6rem 0.9rem;
+    background: color-mix(in srgb, var(--text) 5%, var(--surface));
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+  }
+  .lights { display: flex; gap: 8px; }
+  .light {
+    position: relative;
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+  }
+  .close { background: #ff5f57; cursor: pointer; }
+  .min { background: #febc2e; }
+  .max { background: #28c840; }
+  .close::after { content: ""; position: absolute; inset: -8px; }
+  .close:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .win-title {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 40ch;
+  }
+  .done {
+    display: none;
+    justify-self: end;
+    min-height: 44px;
+    padding: 0 var(--space-2);
+    background: none;
+    border: 0;
+    color: var(--accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .content { overflow: auto; min-height: 0; padding: var(--space-4); }
+  .content:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin: 0 0 var(--space-2) calc(var(--space-2) * -1);
+    padding: 0 var(--space-2);
+    background: none;
+    border: 0;
+    border-radius: 8px;
+    color: var(--accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .meta { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    background: color-mix(in srgb, var(--cat) 18%, var(--surface));
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cat); }
+  .date { font-size: 0.85rem; color: var(--text-muted); }
+  .desc { margin: var(--space-3) 0; }
+
+  .tools { display: flex; flex-wrap: wrap; gap: var(--space-2); list-style: none; margin: 0 0 var(--space-4); padding: 0; }
+  .tools li {
+    padding: 0.15rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 0 var(--space-4); }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .media { display: grid; gap: var(--space-3); }
+  .media img { width: 100%; height: auto; border-radius: 8px; display: block; }
+  .video { aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; }
+  .video iframe { width: 100%; height: 100%; border: 0; }
+  .placeholder {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    color: var(--text-muted);
+    background: color-mix(in srgb, var(--cat) 15%, var(--surface));
+  }
+
+  .folder-count { margin: 0 0 var(--space-3); font-size: 0.85rem; color: var(--text-muted); }
+  .items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-3);
+  }
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    padding: var(--space-2);
+    background: none;
+    border: 0;
+    border-radius: 10px;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+  }
+  .item:hover { background: color-mix(in srgb, var(--text) 8%, transparent); }
+  .item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .item-art { width: 56px; height: 56px; object-fit: contain; filter: drop-shadow(0 3px 5px rgb(0 0 0 / 0.25)); }
+  .item-label { font-size: 0.85rem; text-align: center; overflow-wrap: anywhere; }
+  .item-date { font-size: 0.75rem; color: var(--text-muted); }
+  .tile { fill: var(--cat); }
+  .play { fill: #fff; }
+
+  /* Desktop: draggable title bar */
+  @media (min-width: 721px) {
+    .titlebar { cursor: grab; touch-action: none; }
+    .titlebar:active { cursor: grabbing; }
+  }
+
+  /* Mobile: full-height sheet sliding up from the bottom */
+  @media (max-width: 720px) {
+    .window {
+      width: 100%;
+      max-width: 100%;
+      height: calc(100dvh - 2rem);
+      max-height: none;
+      margin: auto 0 0 0;
+      border-width: 1px 0 0;
+      border-radius: 16px 16px 0 0;
+      transform: none;
+    }
+    .window[open] { animation: sheet-in 260ms cubic-bezier(0.2, 0.9, 0.3, 1); }
+    @keyframes sheet-in {
+      from { translate: 0 100%; }
+      to { translate: 0 0; }
+    }
+    .win { height: 100%; max-height: none; }
+    .done { display: block; }
+    .close::after { inset: -16px; }
+    .content { padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); }
+  }
+</style>
+
+<script>
+  const dialog = document.getElementById("hobby-window") as HTMLDialogElement;
+  const content = document.getElementById("hobby-content")!;
+  const titleEl = document.getElementById("hobby-title")!;
+  const titlebar = dialog.querySelector<HTMLElement>("[data-drag-handle]")!;
+  const desktop = window.matchMedia("(min-width: 721px)");
+
+  let currentId: string | null = null;
+  let openedByPush = false;
+  let dx = 0;
+  let dy = 0;
+
+  function applyOffset() {
+    dialog.style.setProperty("--dx", `${dx}px`);
+    dialog.style.setProperty("--dy", `${dy}px`);
+  }
+
+  // Opens a project or a folder. "user" = a click, "hash" = the URL told us to.
+  function openItem(id: string, source: "user" | "hash") {
+    if (id === currentId && dialog.open) return;
+    const tpl = document.getElementById(`hobby-${id}`) as HTMLTemplateElement | null;
+    if (!tpl) return;
+
+    const wasOpen = dialog.open;
+    content.replaceChildren(tpl.content.cloneNode(true));
+    content.scrollTop = 0;
+    titleEl.textContent = tpl.dataset.title ?? "";
+    currentId = id;
+
+    if (wasOpen) {
+      // Swapping content inside an open window: keep its position, move focus to the new content
+      content.focus({ preventScroll: true });
+    } else {
+      dx = 0;
+      dy = 0;
+      applyOffset();
+      dialog.showModal();
+    }
+
+    if (source === "user" && location.hash !== `#${id}`) {
+      if (wasOpen) {
+        history.replaceState(null, "", `#${id}`);
+      } else {
+        history.pushState(null, "", `#${id}`);
+        openedByPush = true;
+      }
+    }
+        window.dispatchEvent(
+      new CustomEvent("hobby:opened", { detail: { folder: tpl.dataset.folder ?? null } })
+    );
+  }
+
+  // Runs for every way of closing: red dot, Done, Esc, backdrop, back button
+  dialog.addEventListener("close", () => {
+    content.replaceChildren();
+    currentId = null;
+    const pushed = openedByPush;
+    openedByPush = false;
+    if (location.hash) {
+      if (pushed) history.back();
+      else history.replaceState(null, "", location.pathname + location.search);
+    }
+  });
+
+  // Open/close from the URL hash (links, refresh, back/forward)
+  function syncFromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (/^[a-z0-9-]+$/.test(id) && document.getElementById(`hobby-${id}`)) {
+      openItem(id, "hash");
+    } else if (dialog.open) {
+      openedByPush = false;
+      dialog.close();
+    }
+  }
+  window.addEventListener("popstate", syncFromHash);
+  window.addEventListener("hashchange", syncFromHash);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", syncFromHash);
+  } else {
+    syncFromHash();
+  }
+
+  // Clicks: open an icon/folder/project, close buttons, backdrop
+  let downOnBackdrop = false;
+  dialog.addEventListener("pointerdown", (e) => {
+    downOnBackdrop = e.target === dialog;
+  });
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const opener = target.closest<HTMLElement>("[data-open]");
+    if (opener) {
+      openItem(opener.dataset.open!, "user");
+      return;
+    }
+    if (target.closest("[data-close]") || (target === dialog && downOnBackdrop)) {
+      dialog.close();
+    }
+  });
+
+  // Desktop dragging by the title bar
+  let drag: { startX: number; startY: number } | null = null;
+
+  function clampToViewport() {
+    const r = dialog.getBoundingClientRect();
+    const margin = 80;
+    if (r.top < 0) dy -= r.top;
+    if (r.top > innerHeight - 48) dy -= r.top - (innerHeight - 48);
+    if (r.right < margin) dx += margin - r.right;
+    if (r.left > innerWidth - margin) dx -= r.left - (innerWidth - margin);
+    applyOffset();
+  }
+
+  titlebar.addEventListener("pointerdown", (e) => {
+    if (!desktop.matches || (e.target as HTMLElement).closest("button")) return;
+    drag = { startX: e.clientX - dx, startY: e.clientY - dy };
+    titlebar.setPointerCapture(e.pointerId);
+  });
+  titlebar.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    dx = e.clientX - drag.startX;
+    dy = e.clientY - drag.startY;
+    applyOffset();
+    clampToViewport();
+  });
+  const endDrag = () => { drag = null; };
+  titlebar.addEventListener("pointerup", endDrag);
+  titlebar.addEventListener("pointercancel", endDrag);
+</script>
