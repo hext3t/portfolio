@@ -11,7 +11,7 @@
 - [ ] Write About page
 - [ ] Build CV page (plus downloadable PDF)
 - [ ] Build Hobbies page
-- [ ] Decide on a folder for 3D animation / game dev work, or where it fits
+- [ ] Decide on a folder for 3D animation / game dev work, or where it fits (not for now)
 
 ## Week 2 (14-20 Nov): Visual design and features
 - [ ] Final logo/wordmark, colors, typography (replace placeholders in global.css)

@@ -1,10 +1,107 @@
 ---
-import Base from "../layouts/Base.astro";
+// src/pages/about.astro
+// Adjust the layout import and props to match your own base layout.
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/Base.astro';
+import SkillsConstellation from '../components/SkillsConstellation.astro';
+import portrait from '../assets/portrait.jpg'; // put your photo here first, or the build fails
 ---
 
-<Base title="About">
-  <div style="padding: var(--space-5) var(--page-pad)">
-    <h1>About</h1>
-    <p>Content coming soon.</p>
-  </div>
-</Base>
+<BaseLayout title="About" description="TODO: one-sentence description for search results">
+  <main class="about">
+    <!-- 1. Hero: photo + intro -->
+    <section class="hero">
+      <div class="portrait">
+        <Image
+          src={portrait}
+          alt="TODO: describe the photo, e.g. Portrait of Hex smiling in front of a window"
+          widths={[400, 800]}
+          sizes="(max-width: 800px) 90vw, 420px"
+          loading="eager"
+        />
+      </div>
+
+      <div class="intro">
+        <p class="eyebrow">About</p>
+        <h1>Hi, I'm Hex.</h1>
+        <p class="lead">
+          TODO: 2-3 sentences. Who you are, what you do, where you're based.
+        </p>
+        <p>TODO: one short paragraph on what you do and how you like to work.</p>
+        <p class="actions">
+          <a href="/contact">Get in touch</a>
+          <a href="/cv">View my CV</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- 2. Skills graph -->
+    <section class="skills">
+      <h2>What I work with</h2>
+      <p class="hint">Hover to explore, click a star to highlight its category.</p>
+      <SkillsConstellation />
+    </section>
+
+    <!-- 3. More about me -->
+    <section class="more">
+      <h2>A bit more</h2>
+      <p>TODO: how you work, what you care about, what you're looking for next.</p>
+      <p>
+        Outside of work I make 3D and games. You can see that in
+        <a href="/after-hours">After Hours</a>.
+      </p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .about {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: clamp(1.5rem, 4vw, 4rem) clamp(1rem, 4vw, 2rem);
+    display: grid;
+    gap: clamp(3rem, 8vw, 6rem);
+  }
+
+  /* Hero */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center;
+  }
+  .portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 1rem;
+  }
+  .eyebrow {
+    margin: 0 0 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+  h1 { margin: 0 0 1rem; font-size: clamp(2.25rem, 6vw, 3.75rem); line-height: 1.05; }
+  .lead { font-size: 1.2rem; line-height: 1.5; }
+  .actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
+  .actions a { text-decoration: underline; text-underline-offset: 0.25em; }
+
+  /* Skills */
+  .skills h2 { margin: 0 0 0.25rem; }
+  .hint { margin: 0 0 1.25rem; opacity: 0.7; }
+
+  /* More text */
+  .more { max-width: 65ch; }
+  .more h2 { margin-top: 0; }
+
+  @media (max-width: 800px) {
+    .hero { grid-template-columns: 1fr; }
+    .portrait { max-width: 22rem; }
+    /* The graph is replaced by a list on narrow screens, so hide the hover hint */
+    .hint { display: none; }
+  }
+</style>
