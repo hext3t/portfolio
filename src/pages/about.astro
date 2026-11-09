@@ -28,10 +28,6 @@ import portrait from '../assets/portrait.jpg'; // put your photo here first, or 
           TODO: 2-3 sentences. Who you are, what you do, where you're based.
         </p>
         <p>TODO: one short paragraph on what you do and how you like to work.</p>
-        <p class="actions">
-          <a href="/contact">Get in touch</a>
-          <a href="/cv">View my CV</a>
-        </p>
       </div>
     </section>
 
@@ -60,6 +56,7 @@ import portrait from '../assets/portrait.jpg'; // put your photo here first, or 
     margin-inline: auto;
     padding: clamp(1.5rem, 4vw, 4rem) clamp(1rem, 4vw, 2rem);
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: clamp(3rem, 8vw, 6rem);
   }
 
@@ -74,7 +71,7 @@ import portrait from '../assets/portrait.jpg'; // put your photo here first, or 
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     border-radius: 1rem;
   }
@@ -87,12 +84,17 @@ import portrait from '../assets/portrait.jpg'; // put your photo here first, or 
   }
   h1 { margin: 0 0 1rem; font-size: clamp(2.25rem, 6vw, 3.75rem); line-height: 1.05; }
   .lead { font-size: 1.2rem; line-height: 1.5; }
-  .actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
-  .actions a { text-decoration: underline; text-underline-offset: 0.25em; }
 
   /* Skills */
-  .skills h2 { margin: 0 0 0.25rem; }
-  .hint { margin: 0 0 1.25rem; opacity: 0.7; }
+  /* Wider than the text column so the graph has room */
+  .skills {
+    width: min(92vw, 84rem);
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .skills h2 { margin: 0 0 0.25rem; text-align: center; }
+  .hint { margin: 0 0 1.25rem; opacity: 0.7; text-align: center; }
 
   /* More text */
   .more { max-width: 65ch; }

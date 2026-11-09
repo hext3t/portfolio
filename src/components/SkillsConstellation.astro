@@ -4,16 +4,16 @@
 import { categories, skills, skillsByCategory } from '../data/skills';
 import type { CategoryId } from '../data/skills';
 
-const W = 1000;
-const H = 680;
+const W = 1300;
+const H = 660;
 
 // Hub (category) positions. Categories that share skills sit close together.
 const centers: Record<CategoryId, { x: number; y: number }> = {
-  design: { x: 400, y: 350 },
-  photo: { x: 150, y: 230 },
-  video: { x: 520, y: 130 },
-  uiux: { x: 800, y: 340 },
-  afterhours: { x: 610, y: 560 },
+  design: { x: 540, y: 340 },
+  photo: { x: 190, y: 240 },
+  video: { x: 700, y: 160 },
+  uiux: { x: 1070, y: 330 },
+  afterhours: { x: 840, y: 500 },
 };
 
 // Small seeded random generator so the layout is identical on every build
@@ -289,8 +289,6 @@ const star = (s: number) => `M0,${-s} Q0,0 ${s},0 Q0,0 0,${s} Q0,0 ${-s},0 Q0,0 
     --c-video: #8db6ff;
     --c-uiux: #6fe3c1;
     --c-afterhours: #c9a0ff;
-    --sky: #0b1020;
-    --ink: #e8ecff;
   }
 
   .sr-only {
@@ -302,12 +300,8 @@ const star = (s: number) => `M0,${-s} Q0,0 ${s},0 Q0,0 0,${s} Q0,0 ${-s},0 Q0,0 
     white-space: nowrap;
   }
 
-  .stage {
-    background: radial-gradient(ellipse at 50% 40%, #151c3a 0%, var(--sky) 70%);
-    border-radius: 1rem;
-    overflow: hidden;
-  }
-  svg { display: block; width: 100%; height: auto; }
+  .stage { overflow: visible; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
 
   .graph, .bg {
     transform-box: view-box;
@@ -315,7 +309,7 @@ const star = (s: number) => `M0,${-s} Q0,0 ${s},0 Q0,0 0,${s} Q0,0 ${-s},0 Q0,0 
     will-change: transform;
   }
 
-  .bgstar { fill: #fff; animation: twinkle 5s ease-in-out infinite; }
+  .bgstar { fill: currentColor; animation: twinkle 5s ease-in-out infinite; }
 
   /* Lines */
   .spoke { stroke: var(--c); stroke-width: 0.8; opacity: 0.28; transition: opacity 0.3s; }
@@ -334,13 +328,9 @@ const star = (s: number) => `M0,${-s} Q0,0 ${s},0 Q0,0 0,${s} Q0,0 ${-s},0 Q0,0 
   .star .core { fill: var(--c); animation: twinkle 4s ease-in-out infinite; animation-delay: var(--d, 0s); }
   .star .ring { fill: none; stroke: var(--c2); stroke-width: 1.4; opacity: 0.9; }
   .star text {
-    fill: var(--ink);
-    font-size: 12px;
-    opacity: 0.7;
-    paint-order: stroke;
-    stroke: var(--sky);
-    stroke-width: 3px;
-    stroke-linejoin: round;
+    fill: currentColor;
+    font-size: 13px;
+    opacity: 0.75;
     pointer-events: none;
     transition: opacity 0.3s;
   }

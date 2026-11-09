@@ -7,6 +7,12 @@
   --accent: #3b5bfd;
   --border: #dcdcd6;
 
+  /* Category colors (placeholders, adjust freely) */
+  --cat-graphic: #e8590c;
+  --cat-video: #7048e8;
+  --cat-photo: #0c8599;
+  --cat-uiux: #d6336c;
+
   /* Type */
   --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
 
@@ -48,4 +54,6 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  
+body:has(dialog[open]) { overflow: hidden; }
 }

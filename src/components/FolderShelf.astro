@@ -32,11 +32,13 @@ import { categories, works } from "../data/works";
         {works
           .filter((w) => w.category === c.id)
           .map((w) => (
-            <li class="work">
-              <div class="thumb">
+            <li>
+              <button type="button" class="work" data-work={w.slug} aria-haspopup="dialog">
+                <span class="thumb" style={`--cat: ${c.color}`}>
                 {w.thumb && <img src={w.thumb} alt="" loading="lazy" />}
-              </div>
+                </span>
               <span class="work-title">{w.title}</span>
+              </button>
             </li>
           ))}
       </ul>
@@ -128,15 +130,33 @@ import { categories, works } from "../data/works";
     margin: 0;
     padding: 0;
   }
+    .work {
+    display: block;
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 8px;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .work:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   .thumb {
+    display: block;
     aspect-ratio: 4 / 3;
     border-radius: 8px;
     overflow: hidden;
-    background: color-mix(in srgb, var(--accent) 15%, var(--surface));
+    background: color-mix(in srgb, var(--cat, var(--accent)) 22%, var(--surface));
+    border-bottom: 3px solid var(--cat, var(--accent));
+    transition: transform 150ms ease;
   }
+  .work:hover .thumb { transform: translateY(-2px); }
   .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .work-title { display: block; margin-top: var(--space-2); font-size: 0.85rem; color: var(--text-muted); }
-</style>
+
+  </style>
 
 <script>
   const shelf = document.querySelector<HTMLElement>(".shelf")!;
@@ -172,12 +192,17 @@ import { categories, works } from "../data/works";
     });
   });
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAll();
+    document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !document.querySelector("dialog[open]")) closeAll();
   });
 
   window.addEventListener("resize", () => {
     const active = shelf.querySelector<HTMLButtonElement>('.folder[aria-expanded="true"]');
     if (active) placeCaret(active, trayFor(active));
+  });
+    window.addEventListener("work:opened", (e) => {
+    const category = (e as CustomEvent<{ category: string }>).detail.category;
+    const btn = shelf.querySelector<HTMLButtonElement>(`.folder[aria-controls="tray-${category}"]`);
+    if (btn && btn.getAttribute("aria-expanded") !== "true") open(btn);
   });
 </script>
